@@ -5,7 +5,6 @@
 // vec2i, vec3i, vec4i
 
 namespace cm {
-
 	template <typename T>
 	struct vec4 {
 		T x, y, z, w;
@@ -27,7 +26,20 @@ namespace cm {
 			swap(rhs);
 			return *this;
 		}
+
+		inline bool operator==(const vec4<T>& rhs) { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
+		inline bool operator!=(const vec4<T>& rhs) { return !operator==(rhs); }
+
+		vec4 operator-() const { 
+			return vec4(-x, -y, -z, -w);
+		}
 	};
+
+	template<typename T>
+	inline std::ostream& operator<<(std::ostream &os, vec4<T> vec) { 
+		os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ")"; 
+		return os; 
+	}
 
 	typedef vec4<float> vec4f;
 }

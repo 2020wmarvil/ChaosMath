@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="cm.h" />
+    <ClInclude Include="ChaosMath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="driver.cpp" />
