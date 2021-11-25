@@ -4,6 +4,10 @@
 // vec2f, vec3f, vec4f
 // vec2i, vec3i, vec4i
 
+// magnitude, magnitudeSquared, normalized
+// dot, cross, 
+// one, zero, up, down, left, right, forward, back, ana, kata
+
 namespace cm {
 	template <typename T>
 	struct vec4 {
@@ -33,7 +37,69 @@ namespace cm {
 		vec4 operator-() const { 
 			return vec4(-x, -y, -z, -w);
 		}
+
+		vec4& operator+=(const vec4& rhs) {
+			x += rhs.x;
+			y += rhs.y;
+			z += rhs.z;
+			w += rhs.w;
+			return *this;
+		}
+
+		vec4& operator-=(const vec4& rhs) {
+			x -= rhs.x;
+			y -= rhs.y;
+			z -= rhs.z;
+			w -= rhs.w;
+			return *this;
+		}
+
+		vec4& operator*=(const T& rhs) {
+			x *= rhs;
+			y *= rhs;
+			z *= rhs;
+			w *= rhs;
+			return *this;
+		}
+
+		vec4& operator/=(const T& rhs) {
+			x /= rhs;
+			y /= rhs;
+			z /= rhs;
+			w /= rhs;
+			return *this;
+		}
 	};
+
+	template <typename T>
+	inline vec4<T> operator+(vec4<T> lhs, const vec4<T>& rhs) {
+		lhs += rhs;
+		return lhs;
+	}
+
+	template <typename T>
+	inline vec4<T> operator-(vec4<T> lhs, const vec4<T>& rhs) {
+		lhs -= rhs;
+		return lhs;
+	}
+
+	template <typename T>
+	inline vec4<T> operator*(vec4<T> lhs, const T& rhs) {
+		lhs *= rhs;
+		return lhs;
+	}
+
+	template <typename T>
+	inline vec4<T> operator*(const T& lhs, vec4<T> rhs) {
+		rhs *= lhs;
+		return rhs;
+	}
+
+	template <typename T> // both ways
+	inline vec4<T> operator/(vec4<T> lhs, const T& rhs) {
+		lhs /= rhs;
+		return lhs;
+	}
 
 	template<typename T>
 	inline std::ostream& operator<<(std::ostream &os, vec4<T> vec) { 
