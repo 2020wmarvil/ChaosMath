@@ -1,19 +1,18 @@
 #pragma once
 
-#include <assert.h> 
+#define CHM_ENABLE_ASSERTS // use this define to manage asserts
 
-// TODO: 
+#ifdef _MSC_VER
+	#define DEBUG_BREAK __debugbreak()
+#else
+	#define DEBUG_BREAK 
+#endif
 
-// make debug define to cull asserts
-
-// custom conversions for each
-
-// convert from each type to each other type
-// vec3 to vec2(vec3.xy)
-// vec4 to vec2(vec4.xy)
-
-// vec2 to vec4(vec2, 0, 0)
-// vec3 to vec4(vec3, 0)
+#ifdef CHM_ENABLE_ASSERTS
+	#define CHM_ASSERT(x) { if (!(x)) { DEBUG_BREAK; } }
+#else
+	#define CHM_ASSERT(x) 
+#endif
 
 namespace cm {
 	#pragma region MATH FUNCS
@@ -61,6 +60,14 @@ namespace cm {
 
 	#pragma endregion
 
+	// forward declarations of each vec size
+	template <typename T>
+	struct vec2;
+	template <typename T>
+	struct vec3;
+	template <typename T>
+	struct vec4;
+
 	#pragma region VEC2
 	template <typename T>
 	struct vec2 {
@@ -70,6 +77,8 @@ namespace cm {
 		vec2(T all) : vec2<T>(all, all) {}
 		vec2(T _x, T _y) : x(_x), y(_y) { }
 		vec2(const vec2<T>& v) { x = v.x; y = v.y; }
+		vec2(const vec3<T>& v) { x = v.x; y = v.y; }
+		vec2(const vec4<T>& v) { x = v.x; y = v.y; }
 		~vec2() {}
 
 		#pragma region MEMBER OVERLOADS
@@ -126,13 +135,18 @@ namespace cm {
 
 		inline vec2<T> normalized() const {
 			float magnitude = this->magnitude();
-			assert(magnitude != 0.0f);
+			CHM_ASSERT(magnitude != 0.0f);
 			return vec2<T>(x, y) / magnitude;
 		}
 
 		inline float dot(const vec2<T>& v) const {
 			return x * v.x + y * v.y;
 		}
+
+		inline vec2<T> perpendicular() const {
+			return vec2<T>(1, -x / y); // we choose 1 as x2, and then solve for y2 = -x1 / y1
+		}
+
 		#pragma endregion
 
 		#pragma region STATIC FUNCTIONS
@@ -146,13 +160,13 @@ namespace cm {
 		static float Angle(const vec2<T>& from, const vec2<T>& to) {
 			float magFrom = from.magnitude();
 			float magTo = to.magnitude();
-			assert(magFrom != 0 && magTo != 0);
+			CHM_ASSERT(magFrom != 0 && magTo != 0);
 			float rhs = from.dot(to) / (magFrom * magTo);
 			return std::acos(rhs);
 		}
 
 		static vec2<T> ClampMagnitude(const vec2<T>& vec, float magnitude) {
-			assert(vec.magnitude() != 0);
+			CHM_ASSERT(vec.magnitude() != 0);
 			return vec.normalized() * magnitude;
 		}
 
@@ -190,12 +204,12 @@ namespace cm {
 		}
 
 		static vec2<T> Normalize(const vec2<T>& vec) {
-			assert(vec.magnitude() != 0);
+			CHM_ASSERT(vec.magnitude() != 0);
 			return vec.normalized();
 		}
 
-		static vec2<T> Perpendicular() {
-			return vec2<T>(1, -x / y); // we choose 1 as x2, and then solve for y2 = -x1 / y1
+		static vec2<T> Perpendicular(const vec2<T>& vec) {
+			return vec.perpendicular();
 		}
 
 		static vec2<T> Pow(const vec2<T>& vec, int e) {
@@ -253,9 +267,6 @@ namespace cm {
 	#pragma endregion
 
 	#pragma endregion
-
-	template <typename T>
-	struct vec4;
 
 	#pragma region VEC3
 	template <typename T>
@@ -329,7 +340,7 @@ namespace cm {
 
 		inline vec3<T> normalized() const {
 			float magnitude = this->magnitude();
-			assert(magnitude != 0.0f);
+			CHM_ASSERT(magnitude != 0.0f);
 			return vec3<T>(x, y, z) / magnitude;
 		}
 
@@ -359,13 +370,13 @@ namespace cm {
 		static float Angle(const vec3<T>& from, const vec3<T>& to) {
 			float magFrom = from.magnitude();
 			float magTo = to.magnitude();
-			assert(magFrom != 0 && magTo != 0);
+			CHM_ASSERT(magFrom != 0 && magTo != 0);
 			float rhs = from.dot(to) / (magFrom * magTo);
 			return std::acos(rhs);
 		}
 
 		static vec3<T> ClampMagnitude(const vec3<T>& vec, float magnitude) {
-			assert(vec.magnitude() != 0);
+			CHM_ASSERT(vec.magnitude() != 0);
 			return vec.normalized() * magnitude;
 		}
 
@@ -410,7 +421,7 @@ namespace cm {
 		}
 
 		static vec3<T> Normalize(const vec3<T>& vec) {
-			assert(vec.magnitude() != 0);
+			CHM_ASSERT(vec.magnitude() != 0);
 			return vec.normalized();
 		}
 
@@ -480,6 +491,8 @@ namespace cm {
 		vec4() : vec4<T>(0, 0, 0, 0) {}
 		vec4(T all) : vec4<T>(all, all, all, all) {}
 		vec4(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) { }
+		vec4(const vec2<T>& v) { x = v.x; y = v.y; z = 0;   w = 0; }
+		vec4(const vec3<T>& v) { x = v.x; y = v.y; z = v.z; w = 0; }
 		vec4(const vec4<T>& v) { x = v.x; y = v.y; z = v.z; w = v.w; }
 		~vec4() {}
 
@@ -547,7 +560,7 @@ namespace cm {
 
 		inline vec4<T> normalized() const {
 			float magnitude = this->magnitude();
-			assert(magnitude != 0.0f);
+			CHM_ASSERT(magnitude != 0.0f);
 			return vec4<T>(x, y, z, w) / magnitude;
 		}
 
@@ -579,12 +592,12 @@ namespace cm {
 		static float Angle(const vec4<T>& from, const vec4<T>& to) {
 			float magFrom = from.magnitude();
 			float magTo = to.magnitude();
-			assert(magFrom != 0 && magTo != 0);
+			CHM_ASSERT(magFrom != 0 && magTo != 0);
 			float rhs = from.dot(to) / (magFrom * magTo);
 			return std::acos(rhs);
 		}
 		static vec4<T> ClampMagnitude(const vec4<T>& vec, float magnitude) {
-			assert(vec.magnitude() != 0);
+			CHM_ASSERT(vec.magnitude() != 0);
 			return vec.normalized() * magnitude;
 		}
 		static vec3<T> Cross(const vec4<T>& left, const vec4<T>& right) {
@@ -624,7 +637,7 @@ namespace cm {
 			);
 		}
 		static vec4<T> Normalize(const vec4<T>& vec) {
-			assert(vec.magnitude() != 0);
+			CHM_ASSERT(vec.magnitude() != 0);
 			return vec.normalized();
 		}
 		static vec4<T> Pow(const vec4<T>& vec, int e) {
@@ -686,10 +699,10 @@ namespace cm {
 
 	#pragma endregion
 
+	// vec typedefs
 	typedef vec2<float> vec2f;
 	typedef vec3<float> vec3f;
 	typedef vec4<float> vec4f;
-
 	typedef vec2<int32_t> vec2i;
 	typedef vec3<int32_t> vec3i;
 	typedef vec4<int32_t> vec4i;
