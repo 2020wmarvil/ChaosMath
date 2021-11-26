@@ -8,11 +8,44 @@
 
 // static functions
 // lerp, pow, dot, cross
-// static members
+
+// make debug define to cull asserts
 
 // convert from each type to each other type
+// vec2 to vec3(vec2, 0)
+// vec2 to vec4(vec2, 0, 0)
+// vec3 to vec4(vec3, 0)
+
+// vec3 to vec2(vec3.xy)
+// vec4 to vec2(vec4.xy)
+// vec4 to vec3(vec4.xyz)
 
 namespace cm {
+	template<typename T>
+	T Max(T left, T right) {
+		return right > left ? right : left;
+	}
+
+	template<typename T>
+	T Min(T left, T right) {
+		return right < left ? right : left;
+	}
+
+	float Clamp01(float t) {
+		return Max(Min(1.0f, t), 0.0f);
+	}
+
+	namespace { // hide helper functions
+		template<typename T> // we have a hidden inner version to disambiguate the Max functions named the same
+		T InnerMax(T left, T right) {
+			return Max(left, right);
+		}
+		template<typename T>
+		T InnerMin(T left, T right) {
+			return Min(left, right);
+		}
+	}
+
 	template <typename T>
 	struct vec3 {
 		T x, y, z;
@@ -53,8 +86,8 @@ namespace cm {
 			return *this;
 		}
 
-		inline bool operator==(const vec4<T>& rhs) { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
-		inline bool operator!=(const vec4<T>& rhs) { return !operator==(rhs); }
+		inline bool operator==(const vec4<T>& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
+		inline bool operator!=(const vec4<T>& rhs) const { return !operator==(rhs); }
 
 		vec4<T> operator-() const { 
 			return vec4<T>(-x, -y, -z, -w);
@@ -122,15 +155,86 @@ namespace cm {
 		#pragma endregion
 
 		#pragma region STATIC FUNCTIONS
+		static vec4<T> one()     { return vec4<T>(1, 1, 1, 1); }
+		static vec4<T> zero()    { return vec4<T>(0, 0, 0, 0); }
 		static vec4<T> right()   { return vec4<T>(1, 0, 0, 0); }
-		static vec4<T> up()      { return vec4<T>(0, 1, 0, 0); }
+		static vec4<T> up()	     { return vec4<T>(0, 1, 0, 0); }
 		static vec4<T> forward() { return vec4<T>(0, 0, 1, 0); }
 		static vec4<T> ana()     { return vec4<T>(0, 0, 0, 1); }
-
 		static vec4<T> left()    { return vec4<T>(-1, 0, 0, 0); }
 		static vec4<T> down()    { return vec4<T>(0, -1, 0, 0); }
 		static vec4<T> back()    { return vec4<T>(0, 0, -1, 0); }
 		static vec4<T> kata()    { return vec4<T>(0, 0, 0, -1); }
+
+		static float Angle(const vec4<T>& from, const vec4<T>& to) {
+			float magFrom = from.magnitude();
+			float magTo = to.magnitude();
+			assert(magFrom != 0 && magTo != 0);
+			float rhs = from.dot(to) / (magFrom * magTo);
+			return std::acos(rhs);
+		}
+
+		static vec4<T> ClampMagnitude(const vec4<T>& vec, float magnitude) {
+			assert(vec.magnitude() != 0);
+			return vec.normalized() * magnitude;
+		}
+
+		static vec3<T> Cross(const vec4<T>& left, const vec4<T>& right) {
+			return left.cross(right);
+		}
+
+		static float Distance(const vec4<T>& left, const vec4<T>& right) {
+			float dx = left.x - right.x;
+			float dy = left.y - right.y;
+			float dz = left.z - right.z;
+			float dw = left.w - right.w;
+
+			return std::sqrt(dx * dx + dy * dy + dz * dz + dw * dw);
+		}
+
+		static float Dot(const vec4<T>& left, const vec4<T>& right) {
+			return left.dot(right);
+		}
+
+		static vec4<T> Lerp(const vec4<T>& left, const vec4<T>& right, float t) {
+			return left + Clamp01(t) * (right - left);
+		}
+
+		static vec4<T> LerpUnclamped(const vec4<T>& left, const vec4<T>& right, float t) {
+			return left + t * (right - left);
+		}
+
+		static vec4<float> Max(const vec4<float>& left, const vec4<float>& right) {
+			return vec4<T>(
+				InnerMax(left.x, right.x),
+				InnerMax(left.y, right.y),
+				InnerMax(left.z, right.z),
+				InnerMax(left.w, right.w)
+			);
+		}
+
+		static vec4<T> Min(const vec4<T>& left, const vec4<T>& right) {
+			return vec4<T>(
+				InnerMin(left.x, right.x),
+				InnerMin(left.y, right.y),
+				InnerMin(left.z, right.z),
+				InnerMin(left.w, right.w)
+			);
+		}
+
+		static vec4<T> Normalize(const vec4<T>& vec) {
+			assert(vec.magnitude() != 0);
+			return vec.normalized();
+		}
+
+		static vec4<T> Scale(const vec4<T>& left, const vec4<T>& right) {
+			return vec4<T>(
+				left.x * right.x,
+				left.y * right.y,
+				left.z * right.z,
+				left.w * right.w
+			);
+		}
 		#pragma endregion
 	};
 

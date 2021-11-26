@@ -8,15 +8,13 @@ int main() {
 	cm::vec4f v2(1, 2, 3, 4);
 	cm::vec4f v3(v2);
 
-	std::cout << cm::vec4f::right() << std::endl;
-	std::cout << cm::vec4f::up() << std::endl;
-	std::cout << cm::vec4f::forward() << std::endl;
-	std::cout << cm::vec4f::ana() << std::endl;
+	cm::vec4f t1(31, 96, -48, 15);
+	cm::vec4f t2(-72, 14, -33, -57);
 
-	std::cout << cm::vec4f::left() << std::endl;
-	std::cout << cm::vec4f::down() << std::endl;
-	std::cout << cm::vec4f::back() << std::endl;
-	std::cout << cm::vec4f::kata() << std::endl;
+	std::cout << cm::vec4f::Normalize(t1) << std::endl;
+	std::cout << cm::vec4f::Normalize(t2) << std::endl;
+	std::cout << cm::vec4f::Scale(t1, t2) << std::endl;
+	std::cout << cm::vec4f::Scale(t2, t1) << std::endl;
 
 	return 0;
 }
