@@ -9,7 +9,6 @@
 // static functions
 // lerp, pow, dot, cross
 // static members
-// one, zero, up, down, left, right, forward, back, ana, kata
 
 // convert from each type to each other type
 
@@ -121,6 +120,18 @@ namespace cm {
 			);
 		}
 		#pragma endregion
+
+		#pragma region STATIC FUNCTIONS
+		static vec4<T> right()   { return vec4<T>(1, 0, 0, 0); }
+		static vec4<T> up()      { return vec4<T>(0, 1, 0, 0); }
+		static vec4<T> forward() { return vec4<T>(0, 0, 1, 0); }
+		static vec4<T> ana()     { return vec4<T>(0, 0, 0, 1); }
+
+		static vec4<T> left()    { return vec4<T>(-1, 0, 0, 0); }
+		static vec4<T> down()    { return vec4<T>(0, -1, 0, 0); }
+		static vec4<T> back()    { return vec4<T>(0, 0, -1, 0); }
+		static vec4<T> kata()    { return vec4<T>(0, 0, 0, -1); }
+		#pragma endregion
 	};
 
 	#pragma region NON-MEMBER OVERLOADS
@@ -155,7 +166,7 @@ namespace cm {
 	}
 
 	template<typename T>
-	inline std::ostream& operator<<(std::ostream &os, vec4<T> vec) { 
+	inline std::ostream& operator<<(std::ostream &os, const vec4<T> vec) { 
 		os << "(" << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ")"; 
 		return os; 
 	}
